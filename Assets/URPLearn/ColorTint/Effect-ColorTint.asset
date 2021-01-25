@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ef765911970408da4a461d2e6a8637, type: 3}
+  m_Name: Effect-ColorTint
+  m_EditorClassIdentifier: 
+  active: 1
+  _shader: {fileID: 4800000, guid: 63e32bed7b4d74df0bda9aa5ca26f1d5, type: 3}
+  _color: {r: 1, g: 0.83773583, b: 0.7971698, a: 1}
