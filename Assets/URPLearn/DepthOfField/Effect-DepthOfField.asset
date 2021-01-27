@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9ee2953f07ad4b57a48ae1103a8412b, type: 3}
   m_Name: Effect-DepthOfField
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   _shader: {fileID: 4800000, guid: 398901c1078fb4287ac839a2d8507247, type: 3}
   _iteratorCount: 4
   _focusDistance: 0.36

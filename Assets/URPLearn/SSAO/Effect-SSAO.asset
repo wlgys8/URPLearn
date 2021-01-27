@@ -15,7 +15,7 @@ MonoBehaviour:
   active: 1
   _shader: {fileID: 4800000, guid: 84c29b4fbe7744750af80d2de80b0d4e, type: 3}
   _contrast: 0.5
-  _atten: 0.5
+  _atten: 1
   _sampleRadius: 0.1
   _sampleCount: 8
   _debug: 0
