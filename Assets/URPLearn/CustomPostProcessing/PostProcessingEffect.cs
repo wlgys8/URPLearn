@@ -8,8 +8,8 @@ namespace URPLearn{
     public abstract class PostProcessingEffect : ScriptableObject
     {
         
-        public bool active;
+        public bool active = true;
         
-        public abstract bool Render(CommandBuffer cmd, ref RenderingData renderingData,RenderTargetIdentifier source,RenderTargetIdentifier dst);
+        public abstract void Render(CommandBuffer cmd, ref RenderingData renderingData,PostProcessingRenderContext context);
     }
 }

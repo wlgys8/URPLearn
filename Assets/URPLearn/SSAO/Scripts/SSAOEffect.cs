@@ -29,6 +29,9 @@ namespace URPLearn{
         [SerializeField]
         private bool _debug = false;
 
+        [SerializeField]
+        private bool _blur = false;
+
         private void OnValidate() {
             this.UpdateMaterialProperties();
         }
@@ -47,11 +50,12 @@ namespace URPLearn{
                 _material.SetInt("_SampleCount",_sampleCount);
             }              
         }
+        private PingPongBlitter _blitter = new PingPongBlitter();
 
-        public override bool Render(CommandBuffer cmd, ref RenderingData renderingData, RenderTargetIdentifier source,RenderTargetIdentifier dst)
+        public override void Render(CommandBuffer cmd, ref RenderingData renderingData,PostProcessingRenderContext context)
         {
             if(!_shader){
-                return false;
+                return;
             }
             if(_material == null){
                 _material = new Material(_shader);
@@ -60,8 +64,33 @@ namespace URPLearn{
             var projMatrix = renderingData.cameraData.GetGPUProjectionMatrix();
             _material.SetMatrix("CustomProjMatrix",projMatrix);
             _material.SetMatrix("CustomInvProjMatrix",projMatrix.inverse);
-            cmd.Blit(source,dst,_material);
-            return true;
+            if(_blur){
+                _material.EnableKeyword("_Blur");
+            }else{
+                _material.DisableKeyword("_Blur");
+            }
+            if(_blur){
+                var temp1 = context.GetTemporaryRT(cmd);
+                var temp2 = context.GetTemporaryRT(cmd);
+                _blitter.Prepare(temp1,temp2);
+                //first pass, calculate AO
+                _blitter.BlitAndSwap(cmd,_material,0);
+
+                //second pass, blur horizantal
+                _blitter.BlitAndSwap(cmd,_material,1);
+
+                //third pass, blur vertical
+                _blitter.BlitAndSwap(cmd,_material,2);
+
+                cmd.SetGlobalTexture("_AOTex",_blitter.pingRT);
+
+                context.BlitAndSwap(cmd,_material,3);
+
+                context.ReleaseTemporaryRT(cmd,temp1);
+                context.ReleaseTemporaryRT(cmd,temp2);
+            }else{
+                context.BlitAndSwap(cmd,_material);
+            }
         }
     }
 }

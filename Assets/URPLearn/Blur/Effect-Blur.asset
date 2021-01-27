@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8ef765911970408da4a461d2e6a8637, type: 3}
-  m_Name: Effect-ColorTint
+  m_Script: {fileID: 11500000, guid: 82172ce5a293b4cc585100780275d821, type: 3}
+  m_Name: Effect-Blur
   m_EditorClassIdentifier: 
   active: 0
-  _shader: {fileID: 4800000, guid: 63e32bed7b4d74df0bda9aa5ca26f1d5, type: 3}
-  _color: {r: 1, g: 0.83773583, b: 0.7971698, a: 1}
+  _shader: {fileID: 4800000, guid: 6039f4f4999b64e6e8e7c5ceeff22f71, type: 3}
+  _iteratorCount: 1
+  _blurRadius: 3

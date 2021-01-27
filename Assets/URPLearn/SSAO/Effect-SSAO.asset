@@ -19,3 +19,4 @@ MonoBehaviour:
   _sampleRadius: 0.1
   _sampleCount: 8
   _debug: 0
+  _blur: 1

@@ -14,8 +14,6 @@
         Pass
         {
             HLSLPROGRAM
-            #pragma shader_feature _FOG_GLOBAL
-            #pragma shader_feature _FOG_VOLUMN
 
             #pragma vertex Vert
             #pragma fragment Frag
@@ -52,7 +50,11 @@
             TEXTURE2D_X(_MainTex);
             float4 _MainTex_TexelSize;
             SAMPLER(sampler_LinearClamp);
+            
+            CBUFFER_START(UnityPerMaterial)
             float4 _TintColor;
+            CBUFFER_END
+            
 
             float4 Frag(Varyings i) : SV_Target
             {

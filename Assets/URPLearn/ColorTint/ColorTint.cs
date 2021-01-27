@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -20,21 +18,24 @@ namespace URPLearn{
 
         void OnValidate(){
             if(_material){
-                _material.SetColor("_TintColor",_color);
+                UpdateMaterialProperties();
             }
         }
 
-        public override bool Render(CommandBuffer cmd, ref RenderingData renderingData, RenderTargetIdentifier source, RenderTargetIdentifier dst)
+        private void UpdateMaterialProperties(){
+             _material.SetColor("_TintColor",_color);
+        }
+
+        public override void Render(CommandBuffer cmd, ref RenderingData renderingData, PostProcessingRenderContext context)
         {
             if(!_shader){
-                return false;
+                return;
             }
             if(_material == null){
                 _material = new Material(_shader);
-                _material.SetColor("_TintColor",_color);
+                UpdateMaterialProperties();
             }
-            cmd.Blit(source,dst,_material);
-            return true;
+            context.BlitAndSwap(cmd,_material);
         }
     }
 }

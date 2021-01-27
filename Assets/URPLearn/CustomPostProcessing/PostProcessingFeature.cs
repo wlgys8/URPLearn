@@ -20,7 +20,6 @@ namespace URPLearn{
             if(renderingData.cameraData.renderType != CameraRenderType.Base){
                 return;
             }
-            _pass.Setup(_effects);
             _pass.ConfigureTarget(renderer.cameraColorTarget);
             renderer.EnqueuePass(_pass);
         }
@@ -31,6 +30,7 @@ namespace URPLearn{
         public override void Create()
         {
             _pass = new PostProcessingPass();
+            _pass.Setup(_effects);
         }
     }
 
@@ -44,16 +44,12 @@ namespace URPLearn{
         private const string CommandBufferTag = "CustomPostProcessing";
 
         private List<PostProcessingEffect> _effects;
-        private RenderTargetHandle _tempRT;
-        private RenderTargetIdentifier _pingRTI;
-        private RenderTargetIdentifier _pongRTI;
 
-        private bool _isTempRTHold = false;
+        private PostProcessingRenderContext _postContext = new PostProcessingRenderContext();
 
         public PostProcessingPass(){
             //把自定义的后处理放在透明物体渲染结束后。
             this.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
-            _tempRT.Init("POST_PROCESSING_TEMP_RT");
         }
 
         public void Setup(List<PostProcessingEffect> effects){
@@ -64,40 +60,16 @@ namespace URPLearn{
         {
             var cmd = CommandBufferPool.Get(CommandBufferTag);
             try{
-                cmd.Clear();
+                // cmd.Clear();
                 // 调用渲染函数
                 Render(cmd, ref renderingData,context);
                 // 执行命令缓冲区
-                context.ExecuteCommandBuffer(cmd);
+                // context.ExecuteCommandBuffer(cmd);
             }finally{
                 // 释放命令缓存
                 CommandBufferPool.Release(cmd);
             }
         }
-
-        private void SwitchPingPong(){
-            var temp = _pingRTI;
-            _pingRTI = _pongRTI;
-            _pongRTI = temp;
-        }
-
-        private RenderTargetIdentifier EnsurePongRTI(CommandBuffer cmd,RenderTextureDescriptor des){
-            if(_isTempRTHold){
-                return _pongRTI;
-            }
-            _isTempRTHold = true;
-            cmd.GetTemporaryRT(_tempRT.id,des);
-            _pongRTI = _tempRT.Identifier();
-            return _pongRTI;
-        }
-
-        private void ReleaseAllTempRT(CommandBuffer cmd){
-            if(_isTempRTHold){
-                _isTempRTHold = false;
-                cmd.ReleaseTemporaryRT(_tempRT.id);
-            }
-        }
-
 
 
         void Render(CommandBuffer cmd, ref RenderingData renderingData ,ScriptableRenderContext context)
@@ -105,28 +77,17 @@ namespace URPLearn{
 
             var cameraDes = renderingData.cameraData.cameraTargetDescriptor;
             var colorAttachment = this.colorAttachment;
-            // renderingData.cameraData.requiresDepthTexture = true;
-
-            _pingRTI = colorAttachment;
             try{
-                var index = 0;
-                int switchCount = 0;
+                _postContext.Prepare(ref renderingData,colorAttachment);
                 foreach(var e in _effects){
                     if(e && e.active){
-                        var pongRTI = EnsurePongRTI(cmd,cameraDes);
-                        if(e.Render(cmd,ref renderingData,_pingRTI,pongRTI)){
-                            SwitchPingPong();
-                            switchCount ++;
-                        }
-                        index ++;
+                        e.Render(cmd,ref renderingData,_postContext);
                     }
                 }
-                if(switchCount % 2 == 1){
-                    cmd.Blit(_pingRTI,colorAttachment);
-                }
+                _postContext.BlitBackToSource(cmd);
                 context.ExecuteCommandBuffer(cmd);
             }finally{
-                ReleaseAllTempRT(cmd);
+                _postContext.Release(cmd);
             }
         }  
     }
