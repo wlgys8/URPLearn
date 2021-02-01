@@ -12,10 +12,10 @@ namespace URPLearn{
             
             private static Dictionary<RenderTargetIdentifier,RenderTargetHandle> _usingTempRTs = new Dictionary<RenderTargetIdentifier,RenderTargetHandle>();
             private static int _tempIndex;
-            public static RenderTargetIdentifier Request(CommandBuffer cmd,RenderTextureDescriptor renderTextureDescriptor){
+            public static RenderTargetIdentifier Request(CommandBuffer cmd,RenderTextureDescriptor renderTextureDescriptor,FilterMode filterMode = FilterMode.Point){
                 var handle = new RenderTargetHandle();
                 handle.Init("_POST_PROCESSING_TEMP_" + _tempIndex ++);
-                cmd.GetTemporaryRT(handle.id,renderTextureDescriptor);
+                cmd.GetTemporaryRT(handle.id,renderTextureDescriptor,filterMode);
                 _usingTempRTs.Add(handle.Identifier(),handle);
                 return handle.Identifier();
             }
@@ -57,6 +57,11 @@ namespace URPLearn{
 
         public RenderTargetIdentifier GetTemporaryRT(CommandBuffer cmd){
             var id = TempRTManager.Request(cmd,sourceRenderTextureDescriptor);
+            return id;
+        }
+
+        public RenderTargetIdentifier GetTemporaryRT(CommandBuffer cmd,RenderTextureDescriptor descriptor,FilterMode filter = FilterMode.Point){
+            var id = TempRTManager.Request(cmd,descriptor,filter);
             return id;
         }
 

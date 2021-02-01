@@ -172,7 +172,7 @@
             float4 FragBlurH(Varyings i) : SV_Target
             {
 
-                return BoxBlurH(_MainTex,i.uv * _MainTex_TexelSize.zw,1,2);
+                return BoxBlur(_MainTex,i.uv * _MainTex_TexelSize.zw,2,float2(1,0));
             }
 
 
@@ -197,7 +197,7 @@
             float4 FragBlurV(Varyings i) : SV_Target
             {
 
-                return BoxBlurV(_MainTex,i.uv * _MainTex_TexelSize.zw,1,2);
+                return BoxBlur(_MainTex,i.uv * _MainTex_TexelSize.zw,2,float2(0,1));
             }
 
 

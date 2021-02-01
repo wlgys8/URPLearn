@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13b1b46c13a78471d89007052fe43055, type: 3}
   m_Name: Effect-SSAO
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   _shader: {fileID: 4800000, guid: 84c29b4fbe7744750af80d2de80b0d4e, type: 3}
   _contrast: 0.5
   _atten: 1

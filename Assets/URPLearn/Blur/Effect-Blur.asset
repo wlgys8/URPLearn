@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Effect-Blur
   m_EditorClassIdentifier: 
   active: 0
-  _shader: {fileID: 4800000, guid: 6039f4f4999b64e6e8e7c5ceeff22f71, type: 3}
-  _iteratorCount: 1
-  _blurRadius: 3
+  _boxBlurShader: {fileID: 4800000, guid: 6039f4f4999b64e6e8e7c5ceeff22f71, type: 3}
+  _gaussianBlurShader: {fileID: 4800000, guid: 5bb5a07642cf04d169bb915edd126942, type: 3}
+  _blurType: 3
+  _iteratorCount: 6
+  _boxKernelSizeHalf: 3
+  _blurScale: 1

@@ -1,4 +1,4 @@
-﻿Shader "URPLearn/PostProcessing/BoxBlur"
+﻿Shader "URPLearn/PostProcessing/GaussianBlur"
 {
     Properties
     {
@@ -12,7 +12,6 @@
         HLSLINCLUDE
 
         #pragma shader_feature _BilinearMode
-
 
         #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
         #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Filtering.hlsl"
@@ -46,39 +45,33 @@
         }
 
         TEXTURE2D_X(_MainTex);
-        SAMPLER(sampler_LinearClamp);
 
         CBUFFER_START(UnityPerMaterial)
         float4 _MainTex_TexelSize;
         float _BlurScale;
-        int _KernelSize;
+        SAMPLER(sampler_LinearClamp);
+
         CBUFFER_END
-        
         
         ///水平blur
         float4 FragH(Varyings i) : SV_Target
         {
-
-
             #if _BilinearMode
-            return BOX_BLUR_BILINEAR(_MainTex,i.uv,_KernelSize,float2(_BlurScale,0) * _MainTex_TexelSize.xy);
+            return GAUSSIAN_BLUR_7TAP_BILINEAR(_MainTex,i.uv,half2(_BlurScale,0) * _MainTex_TexelSize.xy);
             #else
-            return BoxBlur(_MainTex,i.uv * _MainTex_TexelSize.zw,_KernelSize,float2(_BlurScale,0));
+            return GaussianBlur7Tap(_MainTex,i.uv * _MainTex_TexelSize.zw,half2(_BlurScale,0));
             #endif
         }
 
         //垂直blur
         float4 FragV(Varyings i) : SV_Target
         {
-
             #if _BilinearMode
-            return BOX_BLUR_BILINEAR(_MainTex,i.uv,_KernelSize,float2(0,_BlurScale) * _MainTex_TexelSize.xy);
+            return GAUSSIAN_BLUR_7TAP_BILINEAR(_MainTex,i.uv,half2(0,_BlurScale) * _MainTex_TexelSize.xy);
             #else
-            return BoxBlur(_MainTex,i.uv * _MainTex_TexelSize.zw,_KernelSize,float2(0,_BlurScale));
+            return GaussianBlur7Tap(_MainTex,i.uv * _MainTex_TexelSize.zw,half2(0,_BlurScale));
             #endif
         }
-
-
 
         ENDHLSL
 

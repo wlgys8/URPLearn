@@ -20,11 +20,11 @@ SSAO的基本流程如下:
 
 无SSAO:
 
-<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/ssao/without-ssao.jpeg" width="300"/>
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/ssao/without-ssao.jpeg" width="600"/>
 
 有SSAO:
 
-<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/ssao/ssao.jpeg" width="300"/>
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/ssao/ssao.jpeg" width="600"/>
 
 
 
@@ -39,7 +39,7 @@ SSAO的基本流程如下:
 
 ```
 
-<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/ssao/ssao-normal.jpeg" width="300"/>
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/ssao/ssao-normal.jpeg" width="600"/>
 
 可以看出来，在Unity的ViewSpace中，z轴朝屏幕外，y轴朝下。
 
@@ -189,11 +189,12 @@ ao = PositivePow(ao * _Atten, _Contrast);
 
 单输出ao效果:
 
-<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/ssao/ssao-debug.jpeg" width="300"/>
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/ssao/ssao-debug.jpeg" width="600"/>
 
 ## Blur处理
 
 在没有Blur处理的情况下，由于采样点数量限制，生成的AO图粒状比较明显。 因此我们可以加入Blur使其更平滑。
+这里使用了简单的BoxBlur。
 
 
 无Blur的情况:

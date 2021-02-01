@@ -3,7 +3,10 @@ guid: 82172ce5a293b4cc585100780275d821
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _boxBlurShader: {fileID: 4800000, guid: 6039f4f4999b64e6e8e7c5ceeff22f71, type: 3}
+  - _gaussianBlurShader: {fileID: 4800000, guid: 5bb5a07642cf04d169bb915edd126942,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
