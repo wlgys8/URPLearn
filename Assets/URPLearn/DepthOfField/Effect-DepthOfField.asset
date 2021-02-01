@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 0
   _shader: {fileID: 4800000, guid: 398901c1078fb4287ac839a2d8507247, type: 3}
-  _iteratorCount: 4
   _focusDistance: 0.36
   _focalLength: 30.5
   _aperture: 1.36
+  _blurIteratorCount: 4

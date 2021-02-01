@@ -15,26 +15,28 @@ namespace URPLearn{
 
         private Material _material;
 
-        [SerializeField]
-        private int _iteratorCount = 1;
 
         [Tooltip("相机对焦的物距，单位m，在公式中记为u")]
         [SerializeField]
-        private float _focusDistance = 1; //对焦物距，单位米
+        private float _focusDistance = 1;
 
-        [Tooltip("相机的焦距(这里其实应该是成像胶片到镜头的距离),在公式中记为v")]
+        [Tooltip("相机的焦距(这里其实应该是成像胶片到镜头的距离),单位毫米，在公式中记为v")]
         [SerializeField]
-        private float _focalLength; //焦距(其实是像距) 单位毫米
+        private float _focalLength;
 
         [Tooltip("相机的光圈值F = f / 镜片直径")]
         [SerializeField]
-        private float _aperture = 6.3f; //单位毫米
+        private float _aperture = 6.3f;
 
+        [Tooltip("Blur迭代次数，对性能有影响")]
+        [SerializeField]
+        private int _blurIteratorCount = 1;
 
         private void OnValidate() {
             _aperture = Mathf.Clamp(_aperture,1,32);
             _focalLength = Mathf.Clamp(_focalLength,1,300);
             _focusDistance = Mathf.Max(_focusDistance,0.1f);
+            _blurIteratorCount = Mathf.Clamp(_blurIteratorCount,1,5);
         }
 
         /// <summary>
@@ -86,8 +88,8 @@ namespace URPLearn{
                 0
             );
             _material.SetVector("_DOFParams",DOFParams);
-            _iteratorCount = Mathf.Clamp(_iteratorCount,1,5);
-            for(var i = 0; i < _iteratorCount; i ++){
+            
+            for(var i = 0; i < _blurIteratorCount; i ++){
                 //水平blur
                 context.BlitAndSwap(cmd,_material,0);
                 //垂直blur

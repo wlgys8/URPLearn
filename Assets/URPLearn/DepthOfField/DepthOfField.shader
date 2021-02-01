@@ -46,23 +46,16 @@
         TEXTURE2D_X_FLOAT(_CameraDepthTexture);
 
         CBUFFER_START(UnityPerMaterial)
-
         
         float4 _MainTex_TexelSize;
-        float _FocusDistance;
-        
-        float _FocusDistanceThreshold;
-        float _FarBlurDistance;
-
         float4 _DOFParams; 
 
         CBUFFER_END
-
         
 
         #define rcpF _DOFParams.x
         #define focalLength _DOFParams.y
-        #define rcp_FURcpf _DOFParams.z
+        #define rcpFFA _DOFParams.z // rcp(_focalLength * rcpf * _aperture)
 
         float SampleDepth(float2 uv){
             return LOAD_TEXTURE2D_X(_CameraDepthTexture, _MainTex_TexelSize.zw * uv).x;
@@ -72,28 +65,20 @@
             return LinearEyeDepth(SampleDepth(uv),_ZBufferParams);
         }
 
-        float CalcualteDepthOffset(float2 uv){
-            float depth = SampleEyeLinearDepth(uv);
-            float depthOffset = max(0,abs(depth - _FocusDistance) - _FocusDistanceThreshold);
-            depthOffset /= _FarBlurDistance;
-            depthOffset = saturate(depthOffset);
-            return depthOffset;
-        }
-
         //计算像距
         float4 CalculateImageDistance(float objDis){
-            return 1 / (rcpF - 0.001 / objDis);
+            return rcp(rcpF - rcp(objDis));
         }
 
         //弥散圆直径
         float CalculateConfusionCircleDiam(float objDis){
             float imageDis = CalculateImageDistance(objDis);
-            return abs(imageDis - focalLength) * rcp_FURcpf;
+            return abs(imageDis - focalLength) * rcpFFA;
         }
 
         float CalculateBlurFactor(float2 uv){
             float depth = SampleEyeLinearDepth(uv);
-            float objDis = depth - focalLength * 0.001;
+            float objDis = 1000 * depth - focalLength; //转为mm
             float blurDiam = clamp(CalculateConfusionCircleDiam(objDis),0,3);
             return blurDiam;
         }
@@ -102,15 +87,14 @@
         float4 FragH(Varyings i) : SV_Target
         {
             float factor = CalculateBlurFactor(i.uv);
-            return BoxBlurH(_MainTex,i.uv * _MainTex_TexelSize.zw,factor,2);
+            return BoxBlur(_MainTex,i.uv * _MainTex_TexelSize.zw,2,float2(factor,0));
         }
 
         //垂直blur
         float4 FragV(Varyings i) : SV_Target
         {
             float factor = CalculateBlurFactor(i.uv);
-            // return factor;
-            return BoxBlurV(_MainTex,i.uv * _MainTex_TexelSize.zw,factor,2);
+            return BoxBlur(_MainTex,i.uv * _MainTex_TexelSize.zw,2,float2(0,factor));
         }
 
         ENDHLSL
