@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e453a339ba4ea4ddbb932622a2cdd704, type: 3}
+  m_Name: Effect-Bloom
+  m_EditorClassIdentifier: 
+  active: 0
+  _shader: {fileID: 4800000, guid: 1f496fe0f044348a398f9904a295731b, type: 3}
+  downSample: 3
+  _blurIteratorCount: 1
+  _threshold: 0
+  _debug: 0
