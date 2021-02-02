@@ -10,31 +10,14 @@ namespace URPLearn{
     public class BlurEffect : PostProcessingEffect
     {
 
-        public enum BlurType{
-            None,
-            Box,
-            BoxBilinear,
-            Gaussian,
-            GaussianBilinear,
-        }
-
-
-        
-        private Material _material;
-
-        [SerializeField]
-        private Shader _boxBlurShader;
-
-        [SerializeField]
-        private Shader _gaussianBlurShader;
-
         [SerializeField]
         private BlurType _blurType;
-
-        
         
         [SerializeField]
         private int _iteratorCount = 1;
+
+        [SerializeField]
+        private int _downSample = 1;
 
         [Tooltip("Only work for BoxFilter")]
         [SerializeField]
@@ -43,52 +26,23 @@ namespace URPLearn{
         [SerializeField]
         private float _blurScale = 1;
 
-        private Shader _usingShader;
+        private BlurBlitter _blurBlitter = new BlurBlitter();
 
 
         private void OnValidate() {
-            switch(_blurType){
-                case BlurType.Box:
-                case BlurType.BoxBilinear:
-                _usingShader = _boxBlurShader;
-                break;
-                case BlurType.Gaussian:
-                case BlurType.GaussianBilinear:
-                _usingShader = _gaussianBlurShader;
-                break;
-                default:
-                _usingShader = null;
-                break;
-            }    
-            _boxKernelSizeHalf = Mathf.Clamp(_boxKernelSizeHalf,1,4);
-            _blurScale = Mathf.Clamp(_blurScale,1,5);
+            _blurBlitter.blurType = _blurType;
+            _blurBlitter.downSample = _downSample;
+            _blurBlitter.iteratorCount = _iteratorCount;
+            _blurBlitter.blurScale = _blurScale;
+            _blurBlitter.boxKernelSizeHalf = _boxKernelSizeHalf;
         }
+
 
         public override void Render(CommandBuffer cmd, ref RenderingData renderingData,PostProcessingRenderContext context)
         {
-            if(!_boxBlurShader){
-                return;
-            }
-            if(!_usingShader){
-                return;
-            }
-            if(!_material || _material.shader != _usingShader){
-                _material = new Material(_usingShader);
-            }
-            if(_blurType == BlurType.GaussianBilinear || _blurType == BlurType.BoxBilinear){
-                _material.EnableKeyword("_BilinearMode");
-            }else{
-                _material.DisableKeyword("_BilinearMode");
-            }
-            _material.SetFloat("_BlurScale",_blurScale);
-            _material.SetInt("_KernelSize",_boxKernelSizeHalf);
-            _iteratorCount = Mathf.Clamp(_iteratorCount,1,6);
-            for(var i = 0; i < _iteratorCount ; i ++){
-                //第一个pass,水平blur
-                context.BlitAndSwap(cmd,_material,0);
-                //第二个pass,垂直blur
-                context.BlitAndSwap(cmd,_material,1);
-            }
+            _blurBlitter.SetSource(context.activeRenderTarget,context.sourceRenderTextureDescriptor);
+            _blurBlitter.Render(cmd);
         }
+   
     }
 }

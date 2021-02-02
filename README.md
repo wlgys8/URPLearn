@@ -17,9 +17,13 @@
 
     2.1 [简单的ColorTint](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/ColorTint)
 
-    2.2 [SSAO](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/SSAO)
+    2.2 [Blur - 模糊效果](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/Blur)
 
-    2.3 [DepthOfField](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/DepthOfField)
+    2.3 [Bloom - 泛光特效](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/Bloom)
+
+    2.4 [SSAO - 屏幕空间环境光遮蔽](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/SSAO)
+
+    2.5 [DepthOfField - 景深](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/DepthOfField)
 
 
 

@@ -3,6 +3,9 @@
 
 各种模糊算法
 
+- BoxBlur
+- Gaussian Blur
+
 
 # BoxBlur
 
@@ -31,6 +34,13 @@
 注意: 
 
 `仅在BlurScale为1时， Bilinear模式才正常模式等效。`
+
+## 优化: 降采样
+
+可以将原贴图缩小到1/2、1/4后(DownSample)，再进行Blit，然后还原到原大小(UpSample)。
+
+这样，在Blur阶段，需要计算的像素量将大大减小。
+
 
 # Gaussian Blur (高斯模糊)
 
