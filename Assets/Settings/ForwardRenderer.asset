@@ -1,5 +1,20 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6210927401162595128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9872c65f263c4e99b18554662add8f2, type: 3}
+  m_Name: ScreenSpacePlanarReflectionFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  _material: {fileID: 2100000, guid: 799a22f3afa574779864e3f7aca208cf, type: 2}
+  _computeShader: {fileID: 7200000, guid: 9f889b1352c0f4bb9a091adda4c75f2b, type: 3}
 --- !u!114 &-2683813475758919810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34,7 +49,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RendererFeatures:
   - {fileID: -2683813475758919810}
-  m_RendererFeatureMap: 7eaffbfddc2dc1da
+  - {fileID: -6210927401162595128}
+  m_RendererFeatureMap: 7eaffbfddc2dc1dac8a4f67f6f5acea9
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   shaders:
     blitPS: {fileID: 4800000, guid: c17132b1f77d20942aa75f8429c0f8bc, type: 3}
@@ -48,12 +64,12 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_TransparentLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_DefaultStencilState:
     overrideStencilState: 0
     stencilReference: 0
     stencilCompareFunction: 8
-    passOperation: 0
-    failOperation: 0
-    zFailOperation: 0
+    passOperation: 2
+    failOperation: 2
+    zFailOperation: 2
   m_ShadowTransparentReceive: 1

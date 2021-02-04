@@ -1,0 +1,93 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+
+
+#pragma kernel Clear
+#pragma kernel DrawReflectionTex1
+#pragma kernel DrawReflectionTex2
+
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+Texture2D<float4> _MainTex;
+Texture2D<float> _CameraDepthTexture;
+float4 _MainTex_TexelSize;
+
+float4x4 _MatrixInvVP;
+float4x4 _MatrixVP;
+
+float4 _PlanarPosition;
+float4 _PlanarNormal;
+
+SamplerState PointClampSampler;
+
+
+float3 TransformPositionCSToWS(float3 positionCS){
+    float4 positionWS = mul(_MatrixInvVP,float4(positionCS,1));
+    positionWS /= positionWS.w;
+    return positionWS.xyz;
+}
+
+float3 Reproject(float3 positionWS){
+    float4 positionCS = mul(_MatrixVP,float4(positionWS,1));
+    positionCS /= positionCS.w;
+    positionCS.xy = (positionCS.xy + 1) * 0.5;
+    return positionCS.xyz;
+}
+
+float4 GetMirrorPositionWS(float3 positionWS){
+    float normalProj = dot(positionWS - _PlanarPosition,_PlanarNormal);
+    return float4(positionWS - normalProj * _PlanarNormal * 2,normalProj);
+}
+
+
+[numthreads(8,8,1)]
+void Clear (uint3 id : SV_DispatchThreadID)
+{
+    Result[id.xy] = float4(0,0,0,0);
+}
+
+
+float4 GetMirrorPositionWSFromID(uint3 id){
+    float2 pixelCoord = id.xy;
+    float2 uv = id.xy * _MainTex_TexelSize.xy;
+    float depth = _CameraDepthTexture.SampleLevel(PointClampSampler,uv,0);
+    float3 positionCS = float3(uv * 2 -1,depth);
+    float3 positionWS = TransformPositionCSToWS(positionCS);
+    float4 mirrorPositionWS = GetMirrorPositionWS(positionWS);  
+    return mirrorPositionWS;
+}
+
+float3 GetMirrorUVDepthFromID(uint3 id){
+    float4 mirrorPositionWS = GetMirrorPositionWSFromID(id);
+    if(mirrorPositionWS.w > 0.01){
+        float3 uvAndDepth = Reproject(mirrorPositionWS.xyz);
+        return uvAndDepth;
+    }else{
+        return float3(0,0,0);
+    }
+}
+
+
+//Draw Reflection Tex
+[numthreads(8,8,1)]
+void DrawReflectionTex1 (uint3 id : SV_DispatchThreadID){
+    float3 uvAndDepth = GetMirrorUVDepthFromID(id);
+    float2 toPixelCoord = uvAndDepth.xy * _MainTex_TexelSize.zw;
+    Result[toPixelCoord] = float4(_MainTex[id.xy].rgb,uvAndDepth.z);
+}
+
+//Draw Reflection Tex Again to fix Depth Issue
+[numthreads(8,8,1)]
+void DrawReflectionTex2 (uint3 id : SV_DispatchThreadID){
+    float3 uvAndDepth = GetMirrorUVDepthFromID(id);
+    float2 toPixelCoord = uvAndDepth.xy * _MainTex_TexelSize.zw;
+    float4 originalColor = Result[toPixelCoord];
+    if(uvAndDepth.z > originalColor.a){
+        Result[toPixelCoord] = float4(_MainTex[id.xy].rgb,1);
+    }else{
+        Result[toPixelCoord] = float4(originalColor.rgb,1);
+    }
+}

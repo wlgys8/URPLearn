@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 0
   _shader: {fileID: 4800000, guid: 1f496fe0f044348a398f9904a295731b, type: 3}
-  downSample: 3
+  downSample: 2
   _blurIteratorCount: 1
-  _threshold: 0
+  _threshold: 0.205
   _debug: 0

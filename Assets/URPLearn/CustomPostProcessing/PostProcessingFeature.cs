@@ -20,7 +20,7 @@ namespace URPLearn{
             if(renderingData.cameraData.renderType != CameraRenderType.Base){
                 return;
             }
-            _pass.ConfigureTarget(renderer.cameraColorTarget);
+            _pass.ConfigureTarget(renderer.cameraColorTarget,renderer.cameraDepth);
             renderer.EnqueuePass(_pass);
         }
 
@@ -60,7 +60,7 @@ namespace URPLearn{
         {
             var cmd = CommandBufferPool.Get(CommandBufferTag);
             try{
-                // cmd.Clear();
+                cmd.Clear();
                 // 调用渲染函数
                 Render(cmd, ref renderingData,context);
                 // 执行命令缓冲区
@@ -74,7 +74,6 @@ namespace URPLearn{
 
         void Render(CommandBuffer cmd, ref RenderingData renderingData ,ScriptableRenderContext context)
         {       
-
             var cameraDes = renderingData.cameraData.cameraTargetDescriptor;
             var colorAttachment = this.colorAttachment;
             try{
