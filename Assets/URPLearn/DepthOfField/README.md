@@ -141,5 +141,6 @@ for(var i = 0; i < _blurIteratorCount; i ++){
 
 ```
 
-最终效果对比
+# 最终效果
 
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/dof/depthOfField-final.jpeg" width="800"/>
