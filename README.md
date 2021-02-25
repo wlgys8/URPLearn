@@ -36,11 +36,11 @@
 
 # URP中的GUP Instance功能
 
-1. [用GPU Instance绘制草植]()
+1. [用GPU Instance绘制草植](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/GrassGPUInstances)
 
 # 扩展阅读
 
-1. [HDR相关原理] (https://github.com/wlgys8/URPLearn/wiki/HDR)
+1. [HDR相关原理](https://github.com/wlgys8/URPLearn/wiki/HDR)
     - ToneMapping
     - 浮点纹理
 2. [什么是Gamma矫正、线性色彩空间和sRGB](https://zhuanlan.zhihu.com/p/66558476)
