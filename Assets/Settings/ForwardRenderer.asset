@@ -50,7 +50,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: -2683813475758919810}
   - {fileID: -6210927401162595128}
-  m_RendererFeatureMap: 7eaffbfddc2dc1dac8a4f67f6f5acea9
+  - {fileID: 7382238674493079368}
+  m_RendererFeatureMap: 7eaffbfddc2dc1dac8a4f67f6f5acea9487f4f30f6fa7266
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   shaders:
     blitPS: {fileID: 4800000, guid: c17132b1f77d20942aa75f8429c0f8bc, type: 3}
@@ -73,3 +74,16 @@ MonoBehaviour:
     failOperation: 2
     zFailOperation: 2
   m_ShadowTransparentReceive: 1
+--- !u!114 &7382238674493079368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c216d22b05d9c4ef39ab4fdb451f43bc, type: 3}
+  m_Name: GrassRenderFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
