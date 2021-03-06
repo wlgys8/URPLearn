@@ -1,6 +1,3 @@
-<script type="text/javascript" async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-
 
 # 写在前面
 
@@ -47,11 +44,14 @@ https://zhuanlan.zhihu.com/p/41212352
 
 均值模糊。 即取指定大小(size * size)范围内的像素，相加后取平均值。 一个3x3的均值模糊卷积核，对应形式如下:
 
+$$
 \begin{bmatrix}
 1/9 & 1/9 & 1/9  \\\ 
 1/9 & 1/9 & 1/9  \\\ 
 1/9 & 1/9 & 1/9  \\\ 
 \end{bmatrix} 
+
+$$
 
 在URP的Shader中实现代码如下:
 
