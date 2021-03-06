@@ -209,7 +209,9 @@ half4 GaussianBlur7Tap(Texture2D tex,float2 pixelCoord,float2 offset){
 
 使用Bilinear + 线性分解后，每个像素的卷积计算，累计只需要采样`n + 1`次.
 
-以BoxFilter为例, 假设我们要采样(i,j)和(i+1,j)两个位置的像素，进行均值运算，那么只要在贴图采样时，使用`Bilinear`模式，并将uv设为(i + 0.5,j)，即可以通过一次采样得到均值结果。
+### 3.2.1 BoxBlur使用Bilinear采样实现
+
+以BoxBlur为例, 假设我们要采样(i,j)和(i+1,j)两个位置的像素，进行均值运算，那么只要在贴图采样时，使用`Bilinear`模式，并将uv设为(i + 0.5,j)，即可以通过一次采样得到均值结果。
 
 使用`Bilinear采样`优化后的BoxBlur Shader实现:
 
@@ -244,6 +246,39 @@ half4 BoxBlurBilinear(Texture2D tex,sampler linearSampler,float2 uv,int halfKern
 
 - 在水平模糊Pass时，令`offset = (1 / textureWidth,0)`;
 - 在垂直模糊Pass时，令`offset = (0, 1 / textureHeight)`;
+
+### 3.2.2 高斯模糊的Bilinear采样实现
+
+高斯模糊同样可以使用Blinear采样来实现，只是采样uv位置计算稍微复杂一些。
+
+考虑以下问题:
+
+```
+已知系数a,b和采样坐标u,v，求m,n，使得
+
+m * BilinearSampleTex(u + n,v) = a * BilinearSampleTex(u,v) + b * BilinearSampleTex(u + 1,v).
+
+```
+
+不难得出：
+
+```
+n = b / (a + b)
+m = (a + b)
+```
+
+利用以上公式，`size = 7,sigma = 1`的高斯模糊单纬度Bilinear采样实现代码如下:
+
+```hlsl
+half4 GaussianBlur7TapBilinear(Texture2D tex, sampler texSampler, float2 uv,float2 offset){
+    half4 color = half4(0,0,0,0);
+    color += 0.4333945 * SAMPLE_TEXTURE2D_X(tex, texSampler,uv + offset * 0.558020); 
+    color += 0.4333945 * SAMPLE_TEXTURE2D_X(tex, texSampler,uv - offset * 0.558020);
+    color += 0.066606 * SAMPLE_TEXTURE2D_X(tex, texSampler,uv + offset * 2.089782);
+    color += 0.066606 * SAMPLE_TEXTURE2D_X(tex, texSampler,uv - offset * 2.089782);
+    return color;
+}
+```
 
 
 ## 3.3 降采样
