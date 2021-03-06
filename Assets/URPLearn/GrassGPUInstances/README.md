@@ -434,6 +434,7 @@ public static Vector3 RandomPointInsideTriangle(Vector3 p1,Vector3 p2,Vector3 p3
 ### 6.3 种植实现
 
 逻辑如下:
+
  - 要遍历一个Mesh的三角面
  - 计算三角面积，乘以密度，计算出需要种植的数量n
  - 在三角内部生成n个随机点，作为种植位
