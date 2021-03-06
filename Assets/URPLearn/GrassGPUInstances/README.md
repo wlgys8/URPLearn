@@ -26,7 +26,7 @@ CommandBuffer中，绘制Mesh Instance有以下几个接口可用:
 
 ```csharp
 void CommandBuffer.DrawMeshInstancedProcedural(Mesh mesh, int submeshIndex, Material material, int shaderPass, int count, [MaterialPropertyBlock properties = null])
-````
+```
 
 看接口参数，需要准备一个Mesh，一份材质/Shader.
 
@@ -96,6 +96,7 @@ Shader中定义单个草的数据结构:
 ```
 
 其中:
+
 - `localToTerrian` 这个矩阵用来控制单株草在地面上的种植偏移和旋转.
 - `texParams`用来控制草贴图在atlas中的采样(如果需要的话)
 
