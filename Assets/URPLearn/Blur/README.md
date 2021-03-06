@@ -91,7 +91,7 @@ half4 BoxBlur(Texture2D tex,float2 pixelCoord,float halfKernelSize){
 
 [WIKI](https://en.wikipedia.org/wiki/Gaussian_blur)
 
-不同于均值模糊，高斯模糊使用正太分布来为周围的像素分配权重。
+不同于均值模糊，高斯模糊使用正态分布来为周围的像素分配权重。
 
 这里有一个网站，可以计算高斯模糊采用的卷积核: [gaussian-kernel-calculator](http://dev.theomader.com/gaussian-kernel-calculator/)
 
@@ -107,7 +107,7 @@ kernelSize我们前面已经说了，`sigma`则是正态分布公式中的标准
 
 <img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/blur/gaussian7tap_3.jpeg">
 
-看起来没有Box那么的模糊，是由正交分布的特性决定的。
+看起来没有Box那么的模糊，是由正态分布的特性决定的。
 
 # 3. 优化
 
@@ -276,10 +276,4 @@ BoxBlur(tex,pixelCoord,halfKernelSize,float2(1,0));
 ```hlsl
 BoxBlur(tex,pixelCoord,halfKernelSize,float2(N,0));
 ```
-
-
-# 4. 项目地址
-
-https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/Blur
-
 
