@@ -7,6 +7,12 @@
 - Unity版本 2019.4.18f
 - URP版本 7.5.2。
 
+资源文件说明:
+
+- 管线配置位于`Assets/Settings`
+- 用例代码位于`Assets/URPLearn`，按照文件夹区分。有的用例会自带scene场景，其余的统一使用`Assets/Scenes/SampleScene`场景来预览
+- 各种后处理的开关请看`Assets/Settings/ForwardRenderer`面板内，`PostProcessingFeature`中的`Effects`列表。点击选中每个Effect，控制其Active状态来进行开关。
+
 
 # URP源码解读
 
