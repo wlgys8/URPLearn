@@ -276,14 +276,18 @@ void DrawReflectionTex1 (uint3 id : SV_DispatchThreadID){
 
 这样一张初步的反射贴图就生成了，效果如下:
 
-<img src="./">
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/sspr/ref-tex-1.jpeg" />
 
+
+对比正常视角:
+
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/sspr/sspr-original.jpeg" />
 
 ### b.5 存在的问题
 
 如果仔细观察，会发现`b.4`中生成的反射贴图还是存在问题的。例如地面上的桶没有出现在反射贴图中。 这是因为场景中的像素，经过平面反射后，可能会投影到同一个位置。 将b.4中的反射贴图混合到反射平面上可能有更直观的感觉:
 
-<img src="./">
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/sspr/ref-tex-1-error.jpeg" />
 
 可以看见，红圈区域都出现了反射异常。 本应该反射桶的地方，却反射了桶后方的墙壁。 本应反射围栏的地方，却反射了围栏后方的天空。这都是因为在写入反射像素的时候，没有做深度测试。 因此我们需要额外的一步pass来修正这个问题。
 
@@ -307,7 +311,11 @@ void DrawReflectionTex2 (uint3 id : SV_DispatchThreadID){
 
 修复后的反射贴图:
 
-<img src="./">
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/sspr/ref-tex-2.jpeg" />
+
+贴到地面上的效果:
+
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/sspr/sspr-2.jpeg" />
 
 
 ### d. 模糊处理
@@ -316,7 +324,7 @@ void DrawReflectionTex2 (uint3 id : SV_DispatchThreadID){
 
 最终效果:
 
-<img src="./">
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/sspr/ref-tex-blur.jpeg" />
 
 
 
@@ -492,8 +500,7 @@ foreach(var group in _planarRendererGroups.rendererGroups){
 
 额外放置一个反射地面后的效果图:
 
-<img src="./">
-
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/sspr/sspr-final.jpeg" />
 
 # 5. 更多
 
