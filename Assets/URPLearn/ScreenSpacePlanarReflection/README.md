@@ -507,6 +507,7 @@ foreach(var group in _planarRendererGroups.rendererGroups){
 - ComputeShader两个Pass的反射计算实际上有重复内容，有优化空间。
 - 对于高清反射需求，在不能作模糊的情况下，需要探索更有效的方式来修正反射瑕疵。
 - 允许的情况下，可以降低反射贴图分辨率来提升性能。
+- 在SSPR的边缘部分，可以作渐变淡出效果，或者过渡到Cube反射。
 - 有报如下Waning，但运行效果，暂不清楚会有什么影响。
 
     ```
