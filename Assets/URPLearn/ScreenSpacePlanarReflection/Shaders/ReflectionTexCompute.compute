@@ -9,9 +9,9 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-RWTexture2D<float4> Result;
+RWTexture2D<float4> _Result;
 
-Texture2D<float4> _MainTex;
+Texture2D<float4> _CameraColorTexture;
 Texture2D<float> _CameraDepthTexture;
 float4 _MainTex_TexelSize;
 
@@ -25,9 +25,18 @@ SamplerState PointClampSampler;
 
 
 float3 TransformPositionCSToWS(float3 positionCS){
+    //_MatrixInvVP为VP的逆矩阵
     float4 positionWS = mul(_MatrixInvVP,float4(positionCS,1));
     positionWS /= positionWS.w;
     return positionWS.xyz;
+}
+
+float3 ReconstructPositionWS(float2 uv, float depth){
+    //使用uv和depth，可以得到ClipSpace的坐标
+    float3 positionCS = float3(uv * 2 -1,depth);
+    //然后将坐标从ClipSpace转换到世界坐标
+    float3 positionWS = TransformPositionCSToWS(positionCS);
+    return positionWS;
 }
 
 float3 Reproject(float3 positionWS){
@@ -37,6 +46,7 @@ float3 Reproject(float3 positionWS){
     return positionCS.xyz;
 }
 
+//返回float4的xyz分量为镜像坐标，w为坐标到平面的距离平方
 float4 GetMirrorPositionWS(float3 positionWS){
     float normalProj = dot(positionWS - _PlanarPosition,_PlanarNormal);
     return float4(positionWS - normalProj * _PlanarNormal * 2,normalProj);
@@ -46,7 +56,7 @@ float4 GetMirrorPositionWS(float3 positionWS){
 [numthreads(8,8,1)]
 void Clear (uint3 id : SV_DispatchThreadID)
 {
-    Result[id.xy] = float4(0,0,0,0);
+    _Result[id.xy] = float4(0,0,0,0);
 }
 
 
@@ -54,8 +64,7 @@ float4 GetMirrorPositionWSFromID(uint3 id){
     float2 pixelCoord = id.xy;
     float2 uv = id.xy * _MainTex_TexelSize.xy;
     float depth = _CameraDepthTexture.SampleLevel(PointClampSampler,uv,0);
-    float3 positionCS = float3(uv * 2 -1,depth);
-    float3 positionWS = TransformPositionCSToWS(positionCS);
+    float3 positionWS = ReconstructPositionWS(uv,depth);
     float4 mirrorPositionWS = GetMirrorPositionWS(positionWS);  
     return mirrorPositionWS;
 }
@@ -74,20 +83,22 @@ float3 GetMirrorUVDepthFromID(uint3 id){
 //Draw Reflection Tex
 [numthreads(8,8,1)]
 void DrawReflectionTex1 (uint3 id : SV_DispatchThreadID){
-    float3 uvAndDepth = GetMirrorUVDepthFromID(id);
-    float2 toPixelCoord = uvAndDepth.xy * _MainTex_TexelSize.zw;
-    Result[toPixelCoord] = float4(_MainTex[id.xy].rgb,uvAndDepth.z);
+    float2 uv = id.xy;
+    float3 mirrorUVAndDepth = GetMirrorUVDepthFromID(id);
+    float2 mirrorPixelCoord = mirrorUVAndDepth.xy * _MainTex_TexelSize.zw;
+    _Result[mirrorPixelCoord] = float4(_CameraColorTexture[uv].rgb,mirrorUVAndDepth.z);
 }
 
 //Draw Reflection Tex Again to fix Depth Issue
 [numthreads(8,8,1)]
 void DrawReflectionTex2 (uint3 id : SV_DispatchThreadID){
-    float3 uvAndDepth = GetMirrorUVDepthFromID(id);
-    float2 toPixelCoord = uvAndDepth.xy * _MainTex_TexelSize.zw;
-    float4 originalColor = Result[toPixelCoord];
-    if(uvAndDepth.z > originalColor.a){
-        Result[toPixelCoord] = float4(_MainTex[id.xy].rgb,1);
+    float2 uv = id.xy;
+    float3 mirrorUVAndDepth = GetMirrorUVDepthFromID(id);
+    float2 toPixelCoord = mirrorUVAndDepth.xy * _MainTex_TexelSize.zw;
+    float4 originalColor = _Result[toPixelCoord];
+    if(mirrorUVAndDepth.z > originalColor.a){
+        _Result[toPixelCoord] = float4(_CameraColorTexture[uv].rgb,1);
     }else{
-        Result[toPixelCoord] = float4(originalColor.rgb,1);
+        _Result[toPixelCoord] = float4(originalColor.rgb,1);
     }
 }

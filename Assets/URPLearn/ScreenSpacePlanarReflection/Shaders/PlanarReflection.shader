@@ -43,9 +43,9 @@
         }
 
         TEXTURE2D_X(_ReflectionTex);
-        SAMPLER(sampler_LinearClamp);
-
         TEXTURE2D_X_FLOAT(_CameraDepthTexture);
+
+        SAMPLER(sampler_LinearClamp);
 
         CBUFFER_START(UnityPerMaterial)
         CBUFFER_END

@@ -10,8 +10,6 @@ namespace URPLearn{
     {
 
         private ComputeShader _computeShader;
-        private RenderTargetHandle _reflectionTextureHandle;
-
         private BlurBlitter _blurBlitter = new BlurBlitter();
 
         private int _kernalPass1;
@@ -19,9 +17,9 @@ namespace URPLearn{
 
         private int _kernelClear;
 
+        private int _reflectionTexID = Shader.PropertyToID("_ReflectionTex");
 
         public SSPRTexGenerator(){
-            _reflectionTextureHandle.Init("_ReflectionTex");
         }
 
         public void Setup(ComputeShader cp){
@@ -32,78 +30,77 @@ namespace URPLearn{
         }
 
 
-       public void Render(CommandBuffer cmd, ref RenderingData renderingData)
+       public void Render(CommandBuffer cmd, ref RenderingData renderingData,ref PlanarDescriptor planarDescriptor)
         {
 
             if(!_computeShader){
                 return;
             }
-      
-            if(ReflectPlanar.activePlanars.Count == 0){
-                return;
-            }
-            var planar = ReflectPlanar.activePlanars.First();
 
-            var sourceRenderTextureDescriptor = renderingData.cameraData.cameraTargetDescriptor;
-            var rtWidth = sourceRenderTextureDescriptor.width;
-            var rtHeight = sourceRenderTextureDescriptor.height;
-            var reflectionTexDes = sourceRenderTextureDescriptor;
+            var reflectionTexDes = renderingData.cameraData.cameraTargetDescriptor;
             reflectionTexDes.enableRandomWrite = true;
-            
-            cmd.GetTemporaryRT(_reflectionTextureHandle.id,reflectionTexDes);
+            reflectionTexDes.msaaSamples = 1;
+            cmd.GetTemporaryRT(_reflectionTexID,reflectionTexDes);
 
-            RenderTargetIdentifier reflectionRTI = _reflectionTextureHandle.Identifier();
+            var rtWidth = reflectionTexDes.width;
+            var rtHeight = reflectionTexDes.height;
 
-            
             ///==== Compute Shader Begin ===== ///
-
 
             var cameraData = renderingData.cameraData;
             var viewMatrix = cameraData.camera.worldToCameraMatrix;
             //不知道为什么，第二个参数是false才能正常得到世界坐标
             var projectMatrix = GL.GetGPUProjectionMatrix(cameraData.GetProjectionMatrix(),false);
             var matrixVP = projectMatrix * viewMatrix;
+            var invMatrixVP = matrixVP.inverse;
 
             var threadGroupX = reflectionTexDes.width / 8;
             var threadGroupY = reflectionTexDes.height / 8;
 
-            var cameraColorTex = new RenderTargetIdentifier("_CameraColorTexture");
-
-            var depthTexture = new RenderTargetIdentifier("_CameraDepthTexture");
-
+            RenderTargetIdentifier cameraColorTex = ShaderProperties.CameraColorTexture;
             
-            cmd.SetComputeVectorParam(_computeShader,"_MainTex_TexelSize",new Vector4(1.0f / rtWidth,1.0f /rtHeight,rtWidth,rtHeight));
-            cmd.SetComputeMatrixParam(_computeShader,"_MatrixVP",matrixVP);
-            cmd.SetComputeMatrixParam(_computeShader,"_MatrixInvVP", viewMatrix.inverse * projectMatrix.inverse);
-            cmd.SetComputeVectorParam(_computeShader,"_PlanarPosition",planar.transform.position);
-            cmd.SetComputeVectorParam(_computeShader,"_PlanarNormal",planar.transform.up);
+            cmd.SetComputeVectorParam(_computeShader,ShaderProperties.MainTexelSize,new Vector4(1.0f / rtWidth,1.0f /rtHeight,rtWidth,rtHeight));
+            cmd.SetComputeMatrixParam(_computeShader,ShaderProperties.MatrixVP,matrixVP);
+            cmd.SetComputeMatrixParam(_computeShader,ShaderProperties.MatrixInvVP, invMatrixVP);
+            cmd.SetComputeVectorParam(_computeShader,ShaderProperties.PlanarPosition,planarDescriptor.position);
+            cmd.SetComputeVectorParam(_computeShader,ShaderProperties.PlanarNormal,planarDescriptor.normal);
 
             //clear the reflection texture
-            cmd.SetComputeTextureParam(_computeShader,_kernelClear,"Result",reflectionRTI);
+            cmd.SetComputeTextureParam(_computeShader,_kernelClear,ShaderProperties.Result,_reflectionTexID);
             cmd.DispatchCompute(_computeShader,_kernelClear,threadGroupX,threadGroupY,1);
-
-            cmd.SetComputeTextureParam(_computeShader,_kernalPass1,"Result",reflectionRTI);
-            cmd.SetComputeTextureParam(_computeShader,_kernalPass1,"_MainTex",cameraColorTex);
-
+            
+            cmd.SetComputeTextureParam(_computeShader,_kernalPass1,ShaderProperties.CameraColorTexture,cameraColorTex);
+            cmd.SetComputeTextureParam(_computeShader,_kernalPass1,ShaderProperties.Result,_reflectionTexID);
             cmd.DispatchCompute(_computeShader,_kernalPass1,threadGroupX,threadGroupY,1);
 
-            cmd.SetComputeTextureParam(_computeShader,_kernalPass2,"Result",reflectionRTI);
-            cmd.SetComputeTextureParam(_computeShader,_kernalPass2,"_MainTex",cameraColorTex);
-
+            cmd.SetComputeTextureParam(_computeShader,_kernalPass2,ShaderProperties.CameraColorTexture,cameraColorTex);
+            cmd.SetComputeTextureParam(_computeShader,_kernalPass2,ShaderProperties.Result,_reflectionTexID);
             cmd.DispatchCompute(_computeShader,_kernalPass2,threadGroupX,threadGroupY,1);
     
             // ====== blur begin ===== ///
-            _blurBlitter.SetSource(reflectionRTI,reflectionTexDes);
+            _blurBlitter.SetSource(_reflectionTexID,reflectionTexDes);
             _blurBlitter.blurType = BlurType.BoxBilinear;
             _blurBlitter.iteratorCount = 1;
             _blurBlitter.downSample = 1;
             _blurBlitter.Render(cmd);
 
-            cmd.SetGlobalTexture("_ReflectionTex",reflectionRTI);
+            cmd.SetGlobalTexture(ShaderProperties.ReflectionTexture,_reflectionTexID);
         }      
 
         public void ReleaseTemporary(CommandBuffer cmd){
-            cmd.ReleaseTemporaryRT(_reflectionTextureHandle.id);
+            cmd.ReleaseTemporaryRT(_reflectionTexID);
+        }
+
+        private static class ShaderProperties{
+
+            public static readonly int Result = Shader.PropertyToID("_Result");
+            public static readonly int CameraColorTexture = Shader.PropertyToID("_CameraColorTexture");
+            public static readonly int ReflectionTexture = Shader.PropertyToID("_ReflectionTex");
+            public static readonly int PlanarPosition = Shader.PropertyToID("_PlanarPosition");
+            public static readonly int PlanarNormal = Shader.PropertyToID("_PlanarNormal");
+            public static readonly int MatrixVP = Shader.PropertyToID("_MatrixVP");
+            public static readonly int MatrixInvVP = Shader.PropertyToID("_MatrixInvVP");
+            public static readonly int MainTexelSize = Shader.PropertyToID("_MainTex_TexelSize");
         }
     }
 }

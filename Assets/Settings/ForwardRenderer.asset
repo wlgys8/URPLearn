@@ -33,7 +33,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c5ea31d1b2e544db0876a70cb5a13ce3, type: 2}
   - {fileID: 11400000, guid: 72b7d5423954142eab501d7b07337fb0, type: 2}
   - {fileID: 11400000, guid: c46cd48ed223949c4b870a985bd03bbd, type: 2}
-  - {fileID: 11400000, guid: 5c90ca2ded3d84aee87f898b2d6229c1, type: 2}
+  - {fileID: 0}
   - {fileID: 11400000, guid: b6c71abaafdae4812b59d1187aae6685, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:

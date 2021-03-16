@@ -52,18 +52,25 @@ namespace URPLearn{
                 _ssprTexGenerator.Setup(cp);
             }
 
+            private PlanarRendererGroups _planarRendererGroups = new PlanarRendererGroups();
+
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
             {
                 var cmd = CommandBufferPool.Get(CommandBufferTag);
                 try{
-                    _ssprTexGenerator.Render(cmd,ref renderingData);
-                    cmd.SetRenderTarget(this.colorAttachment,this.depthAttachment);
-                    foreach(var planar in ReflectPlanar.activePlanars){
-                        var rd = planar.GetComponent<Renderer>();
-                        cmd.DrawRenderer(rd,_material);
+                    ReflectPlanar.GetVisiblePlanarGroups(_planarRendererGroups);
+                    foreach(var group in _planarRendererGroups.rendererGroups){
+                        cmd.Clear();
+                        var planarDescriptor = group.descriptor;
+                        var renderers = group.renderers;
+                        _ssprTexGenerator.Render(cmd,ref renderingData,ref planarDescriptor);
+                        cmd.SetRenderTarget(this.colorAttachment,this.depthAttachment);
+                        foreach(var rd in renderers){
+                            cmd.DrawRenderer(rd,_material);
+                        }
+                        _ssprTexGenerator.ReleaseTemporary(cmd);
+                        context.ExecuteCommandBuffer(cmd);
                     }
-                    _ssprTexGenerator.ReleaseTemporary(cmd);
-                    context.ExecuteCommandBuffer(cmd);
                 }finally{
                     CommandBufferPool.Release(cmd);
                 }
