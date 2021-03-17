@@ -10,11 +10,13 @@
 
 两者各有优劣如下
 
-使用摄像机额外渲染:
+使用镜像摄像机渲染:
+
 - 优点是反射效果与真实一致
 - 缺点是再次渲染场景，导致DrawCall翻倍。如果有多个镜面，那不可想像。
 
 SSR:
+
 - 好处是屏幕空间计算，开销恒定，可以实现场景任意表面反射。
 - 缺点1是需要使用RayMarching，开销大。
 - 缺点2是反射质量没有前者好，且只能反射屏幕中的像素。对硬件要求高。
@@ -27,6 +29,7 @@ SSR:
 - 它只适用于平面反射
 - 它同样只能反射屏幕之中的像素
 
+实际项目中，通常是结合多种反射技术共同实现。
 
 # 2. 基本原理
 
@@ -105,7 +108,7 @@ var invMatrixVP = matrixVP.inverse; //vp逆矩阵
 
 ```
 
-其中`GL.GetGPUProjectionMatrix`这个接口的第二个参数，似乎是跟平台的y轴反转有关系，
+其中`GL.GetGPUProjectionMatrix`这个接口的第二个参数，似乎是跟平台的y轴反转有关系
 
 在ComputeShader中同样定义如下变量:
 
@@ -169,11 +172,12 @@ public void ReleaseTemporary(CommandBuffer cmd){
 ```
 
 其中
+
 - Clear 用作清除反射贴图
 - DrawReflectionTex1 用作首次渲染反射贴图
 - DrawReflectionTex2 为二次渲染反射贴图，主要用来修复反射像素的遮挡问题
 
-下面依次说明这三个kernal pass.
+下面依次说明这三个 kernel pass.
 
 
 ### a. 清理反射贴图
@@ -404,6 +408,10 @@ public override void Execute(ScriptableRenderContext context, ref RenderingData 
 
 - ssprTexGenerator即是3.1中所说的利用CompueteShader，来生成反射贴图
 - cmd.DrawRenderer(rd,_material), 即利用3.2中所编写的shader，来绘制反射平面
+
+最终效果:
+
+<img src="https://raw.githubusercontent.com/wiki/wlgys8/URPLearn/.imgs/sspr/sspr-blur.jpeg" />
 
 
 
