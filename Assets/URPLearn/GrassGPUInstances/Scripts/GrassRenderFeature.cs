@@ -10,7 +10,7 @@ namespace URPLearn{
     public class GrassRenderFeature : ScriptableRendererFeature
     {
 
-        private GrassRenderPass _pass = new GrassRenderPass();
+        private GrassRenderPass _pass = null;
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
@@ -22,6 +22,7 @@ namespace URPLearn{
 
         public override void Create()
         {
+            _pass = new GrassRenderPass();
         }
 
 
