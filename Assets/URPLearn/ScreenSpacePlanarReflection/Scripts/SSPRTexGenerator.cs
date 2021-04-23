@@ -12,26 +12,80 @@ namespace URPLearn{
         private ComputeShader _computeShader;
         private BlurBlitter _blurBlitter = new BlurBlitter();
 
+        private int _kernelClear;
         private int _kernalPass1;
         private int _kernalPass2;
 
-        private int _kernelClear;
+        private int _reflectionTexID;
 
-        private int _reflectionTexID = Shader.PropertyToID("_ReflectionTex");
+        private bool _enableBlur = true;
 
-        public SSPRTexGenerator(){
+        /// <summary>
+        /// 在生成反射贴图的时候，是否剔除掉无穷远的像素(例如天空盒)
+        /// </summary>
+        private bool _excludeBackground = false;
+        private bool _isCSLoadTried = false;
+
+        public SSPRTexGenerator(string reflectionTexName = "_ReflectionTex"){
+            _reflectionTexID = Shader.PropertyToID(reflectionTexName);
         }
 
-        public void Setup(ComputeShader cp){
+        public void BindCS(ComputeShader cp){
             _computeShader = cp;
+            this.UpdateKernelIndex();
+        }
+
+        private void UpdateKernelIndex(){
             _kernelClear = _computeShader.FindKernel("Clear");
             _kernalPass1 = _computeShader.FindKernel("DrawReflectionTex1");
             _kernalPass2 = _computeShader.FindKernel("DrawReflectionTex2");
+            if(_excludeBackground){
+                _kernalPass1 +=2;
+                _kernalPass2 +=2;
+            }
         }
 
+        public bool excludeBackground{
+            get{
+                return _excludeBackground;
+            }set{
+                _excludeBackground = value;
+                if(_computeShader){
+                    this.UpdateKernelIndex();
+                }
+            }
+        }
+
+        public bool enableBlur{
+            get{
+                return _enableBlur;
+            }set{
+                _enableBlur = value;
+            }
+        }
+
+        private void TryLoadCSIfNot(){
+            if(_computeShader){
+                return;
+            }
+            if(_isCSLoadTried){
+                return;
+            }
+            _isCSLoadTried = true;
+            #if UNITY_EDITOR
+            _computeShader = UnityEditor.AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/URPLearn/ScreenSpacePlanarReflection/Shaders/ReflectionTexCompute.compute");
+            #endif
+            if(!_computeShader){
+                Debug.LogWarning("missing compute shader");
+                return;
+            }
+            this.BindCS(_computeShader);
+        }
 
        public void Render(CommandBuffer cmd, ref RenderingData renderingData,ref PlanarDescriptor planarDescriptor)
         {
+
+            this.TryLoadCSIfNot();
 
             if(!_computeShader){
                 return;
@@ -76,15 +130,16 @@ namespace URPLearn{
             cmd.SetComputeTextureParam(_computeShader,_kernalPass2,ShaderProperties.CameraColorTexture,cameraColorTex);
             cmd.SetComputeTextureParam(_computeShader,_kernalPass2,ShaderProperties.Result,_reflectionTexID);
             cmd.DispatchCompute(_computeShader,_kernalPass2,threadGroupX,threadGroupY,1);
-    
             // ====== blur begin ===== ///
-            _blurBlitter.SetSource(_reflectionTexID,reflectionTexDes);
-            _blurBlitter.blurType = BlurType.BoxBilinear;
-            _blurBlitter.iteratorCount = 1;
-            _blurBlitter.downSample = 1;
-            _blurBlitter.Render(cmd);
+            if(_enableBlur){
+                _blurBlitter.SetSource(_reflectionTexID,reflectionTexDes);
+                _blurBlitter.blurType = BlurType.BoxBilinear;
+                _blurBlitter.iteratorCount = 1;
+                _blurBlitter.downSample = 1;
+                _blurBlitter.Render(cmd);
+            }
 
-            cmd.SetGlobalTexture(ShaderProperties.ReflectionTexture,_reflectionTexID);
+            cmd.SetGlobalTexture(_reflectionTexID,_reflectionTexID);
         }      
 
         public void ReleaseTemporary(CommandBuffer cmd){
@@ -95,7 +150,6 @@ namespace URPLearn{
 
             public static readonly int Result = Shader.PropertyToID("_Result");
             public static readonly int CameraColorTexture = Shader.PropertyToID("_CameraColorTexture");
-            public static readonly int ReflectionTexture = Shader.PropertyToID("_ReflectionTex");
             public static readonly int PlanarPosition = Shader.PropertyToID("_PlanarPosition");
             public static readonly int PlanarNormal = Shader.PropertyToID("_PlanarNormal");
             public static readonly int MatrixVP = Shader.PropertyToID("_MatrixVP");

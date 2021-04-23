@@ -1,14 +1,17 @@
-﻿// Each #kernel tells which function to compile; you can have many kernels
-
+﻿
+/**
+EXCLUDE_BACKGROUND编译选项表示在生成反射贴图时，是否剔除掉无穷远的像素（例如天空盒）。
+在URP的管线流程中，假如我们在RenderSkyBox这个Pass之前去读CameraColorTexture，会拿到上一帧残留的天空像素
+**/
 
 #pragma kernel Clear
 #pragma kernel DrawReflectionTex1
 #pragma kernel DrawReflectionTex2
+#pragma kernel DrawReflectionTex1 EXCLUDE_BACKGROUND
+#pragma kernel DrawReflectionTex2 EXCLUDE_BACKGROUND
 
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
 RWTexture2D<float4> _Result;
 
 Texture2D<float4> _CameraColorTexture;
@@ -18,8 +21,8 @@ float4 _MainTex_TexelSize;
 float4x4 _MatrixInvVP;
 float4x4 _MatrixVP;
 
-float4 _PlanarPosition;
-float4 _PlanarNormal;
+float3 _PlanarPosition;
+float3 _PlanarNormal;
 
 SamplerState PointClampSampler;
 
@@ -64,6 +67,11 @@ float4 GetMirrorPositionWSFromID(uint3 id){
     float2 pixelCoord = id.xy;
     float2 uv = id.xy * _MainTex_TexelSize.xy;
     float depth = _CameraDepthTexture.SampleLevel(PointClampSampler,uv,0);
+    #ifdef EXCLUDE_BACKGROUND
+    if(depth == 0){ //depth == 0表示无穷远，为天空
+        return float4(0,0,0,0);
+    }
+    #endif
     float3 positionWS = ReconstructPositionWS(uv,depth);
     float4 mirrorPositionWS = GetMirrorPositionWS(positionWS);  
     return mirrorPositionWS;

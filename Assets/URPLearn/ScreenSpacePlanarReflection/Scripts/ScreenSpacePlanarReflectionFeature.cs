@@ -49,7 +49,7 @@ namespace URPLearn{
 
             public void Setup(Material material,ComputeShader cp){
                 _material = material;
-                _ssprTexGenerator.Setup(cp);
+                _ssprTexGenerator.BindCS(cp);
             }
 
             private PlanarRendererGroups _planarRendererGroups = new PlanarRendererGroups();
