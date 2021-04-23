@@ -68,9 +68,15 @@ float4 GetMirrorPositionWSFromID(uint3 id){
     float2 uv = id.xy * _MainTex_TexelSize.xy;
     float depth = _CameraDepthTexture.SampleLevel(PointClampSampler,uv,0);
     #ifdef EXCLUDE_BACKGROUND
-    if(depth == 0){ //depth == 0表示无穷远，为天空
-        return float4(0,0,0,0);
-    }
+        #if UNITY_REVERSED_Z
+        //判定无穷远
+        if(depth == 0)
+        #else
+        if(depth == 1)
+        #endif
+        {
+            return float4(0,0,0,0);
+        }
     #endif
     float3 positionWS = ReconstructPositionWS(uv,depth);
     float4 mirrorPositionWS = GetMirrorPositionWS(positionWS);  
@@ -104,7 +110,13 @@ void DrawReflectionTex2 (uint3 id : SV_DispatchThreadID){
     float3 mirrorUVAndDepth = GetMirrorUVDepthFromID(id);
     float2 toPixelCoord = mirrorUVAndDepth.xy * _MainTex_TexelSize.zw;
     float4 originalColor = _Result[toPixelCoord];
-    if(mirrorUVAndDepth.z > originalColor.a){
+
+    #if UNITY_REVERSED_Z
+    bool overwrite = mirrorUVAndDepth.z > originalColor.a;
+    #else
+    bool overwrite = mirrorUVAndDepth.z < originalColor.a;
+    #endif
+    if(overwrite){
         _Result[toPixelCoord] = float4(_CameraColorTexture[uv].rgb,1);
     }else{
         _Result[toPixelCoord] = float4(originalColor.rgb,1);
