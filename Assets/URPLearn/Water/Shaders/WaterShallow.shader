@@ -107,7 +107,6 @@ Shader "URPLearn/WaterShallow"
     
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
 
             //--------------------------------------
             // GPU Instancing
@@ -133,14 +132,6 @@ Shader "URPLearn/WaterShallow"
                 float3 positionWS               : TEXCOORD1;
                 half3  normalWS                 : TEXCOORD3;
 
-#if _NORMALMAP
-                half3 tangentWS                 : TEXCOORD4;
-                half3 bitangentWS               : TEXCOORD5;
-#endif
-
-#ifdef _MAIN_LIGHT_SHADOWS
-                float4 shadowCoord              : TEXCOORD6; // compute shadow coord per-vertex for the main light
-#endif
                 float4 positionCS               : SV_POSITION;
             };
 
@@ -174,19 +165,9 @@ Shader "URPLearn/WaterShallow"
 
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
                 VertexNormalInputs vertexNormalInput = GetVertexNormalInputs(input.normalOS, input.tangentOS);
-
                 output.positionWS = vertexInput.positionWS;
                 output.uv = input.uv;
                 output.normalWS = vertexNormalInput.normalWS;
-#ifdef _NORMALMAP
-                output.tangentWS = vertexNormalInput.tangentWS;
-                output.bitangentWS = vertexNormalInput.bitangentWS;
-#endif
-
-#ifdef _MAIN_LIGHT_SHADOWS
-                output.shadowCoord = GetShadowCoord(vertexInput);
-#endif
-                // We just use the homogeneous clip position from the vertex input
                 output.positionCS = vertexInput.positionCS;
                 return output;
             }
