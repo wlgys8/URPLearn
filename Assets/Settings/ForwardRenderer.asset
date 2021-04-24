@@ -15,6 +15,20 @@ MonoBehaviour:
   m_Active: 1
   _material: {fileID: 2100000, guid: 799a22f3afa574779864e3f7aca208cf, type: 2}
   _computeShader: {fileID: 7200000, guid: 9f889b1352c0f4bb9a091adda4c75f2b, type: 3}
+--- !u!114 &-4148553168256103892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 543d9b76f78b6428cba3a380ea800ffe, type: 3}
+  m_Name: CopyColorWithAlphaFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  _material: {fileID: 2100000, guid: 150c78219a8414452abf5908e467ce6b, type: 2}
 --- !u!114 &-2683813475758919810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33,7 +47,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c5ea31d1b2e544db0876a70cb5a13ce3, type: 2}
   - {fileID: 11400000, guid: 72b7d5423954142eab501d7b07337fb0, type: 2}
   - {fileID: 11400000, guid: c46cd48ed223949c4b870a985bd03bbd, type: 2}
-  - {fileID: 0}
   - {fileID: 11400000, guid: b6c71abaafdae4812b59d1187aae6685, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:
@@ -51,7 +64,9 @@ MonoBehaviour:
   - {fileID: -2683813475758919810}
   - {fileID: -6210927401162595128}
   - {fileID: 7382238674493079368}
-  m_RendererFeatureMap: 7eaffbfddc2dc1dac8a4f67f6f5acea9487f4f30f6fa7266
+  - {fileID: 4702718936949692336}
+  - {fileID: -4148553168256103892}
+  m_RendererFeatureMap: 7eaffbfddc2dc1dac8a4f67f6f5acea9487f4f30f6fa7266b0976303f56943412c0a469adf606dc6
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   shaders:
     blitPS: {fileID: 4800000, guid: c17132b1f77d20942aa75f8429c0f8bc, type: 3}
@@ -65,7 +80,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_TransparentLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_DefaultStencilState:
     overrideStencilState: 0
     stencilReference: 0
@@ -74,6 +89,19 @@ MonoBehaviour:
     failOperation: 2
     zFailOperation: 2
   m_ShadowTransparentReceive: 1
+--- !u!114 &4702718936949692336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e2501d7b0cc84f74a93f13009215421, type: 3}
+  m_Name: WaterFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &7382238674493079368
 MonoBehaviour:
   m_ObjectHideFlags: 0
