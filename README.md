@@ -40,9 +40,14 @@
 
 3. [ScreenSpacePlanarReflectionFeature(屏幕空间平面反射)](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/ScreenSpacePlanarReflection)
 
-# URP中的GUP Instance功能
+# GUP Instance功能
 
-1. [用GPU Instance绘制草植](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/GrassGPUInstances)
+1. [GPU Instance绘制草植 - Grass Simulation](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/GrassGPUInstances)
+
+# 水体模拟
+
+1. [浅水模拟 - Shallow Water Simulation](https://github.com/wlgys8/URPLearn/tree/master/Assets/URPLearn/Water)
+
 
 # 扩展阅读
 
